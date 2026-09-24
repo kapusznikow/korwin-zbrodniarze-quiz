@@ -112,7 +112,7 @@ function joinRoom(_config, roomName, options = {}) {
     if (closed) return;
     const envelope = JSON.stringify({...payload, sender:selfId, ts:Date.now()});
     try {
-      const res = await fetch(RELAY_HTTP + '/' + encodeURIComponent(topic) + '?cache=no', {
+      const res = await fetch(RELAY_HTTP + '/' + encodeURIComponent(topic), {
         method:'POST',
         body:envelope,
         cache:'no-store'
@@ -120,7 +120,7 @@ function joinRoom(_config, roomName, options = {}) {
       if (!res.ok) throw new Error('HTTP ' + res.status);
     } catch (error) {
       console.error('Relay publish error', error);
-      if (options.onJoinError) options.onJoinError({error});
+      console.warn('Relay publish error', error);
     }
   };
 
@@ -151,7 +151,7 @@ function joinRoom(_config, roomName, options = {}) {
   const connectSocket = () => {
     if (closed) return;
     try {
-      ws = new WebSocket(RELAY_WS + '/' + encodeURIComponent(topic) + '/ws?since=now');
+      ws = new WebSocket(RELAY_WS + '/' + encodeURIComponent(topic) + '/ws');
     } catch (error) {
       if (options.onJoinError) options.onJoinError({error});
       reconnectTimer = setTimeout(connectSocket, 1500);
